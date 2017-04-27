@@ -13,10 +13,9 @@ col = 0;
 row = 0;
 movecount = 0;
 
-row1 = 0;
-col1 = 0;
-
-tempgamestate = gamestate;
+%   rnd shuffle to make the ai moves a little more randomized and for which
+%   player goes first
+rng('shuffle');
 
 % So it also works for ai vs ai
 if playernum == 1
@@ -25,18 +24,32 @@ else
     opponentnum = 1;
 end
 
+
+corners = [1,1;1,3;3,1;3,3];
+cornerstaken = 0;
+cornerstakenopp = 0;
+% 	check if all corners are already taken
+for Row = 1:4
+  	if gamestate(corners(Row, 1), corners(Row, 2)) ~= 0
+     	cornerstaken = cornerstaken + 1;
+        
+    end
+    if gamestate(corners(Row, 1), corners(Row, 2)) == opponentnum
+        cornerstakenopp = cornerstakenopp + 1;
+    end
+end
+
 % count current number of moves for ai to use for strategy of using corners
 % if its the second move.
 for Row = 1:3
     for Col = 1:3
         if gamestate(Row, Col) ~= 0
             movecount = movecount + 1;
-           
         end
     end
 end
 
-[winmove, playerwinner, fullgame] = checkwin(gamestate);
+[winmove, ~, ~] = checkwin(gamestate);
 
 
 % Simple strategy of placing the first move of the game at the center makes it hard 
@@ -74,33 +87,33 @@ end
 if movecount > 1
 %	simple array to loop through to check if opponent placed a
 %	spot in the corner
-	corners = [1,1;1,3;3,1;3,3];
-    
-    cornerstaken = 0;
-% 	check if all corners are already taken
-	for Row = 1:4
-        if gamestate(corners(Row, 1), corners(Row, 2)) ~= 0
-            cornerstaken = cornerstaken + 1;
-        end
-    end
+
 % 	if all corner spots are taken, dont risk going into infinite loop
 % 	trying to find a corner spot available
 	if cornerstaken == 4
 %         break;
+    elseif cornerstakenopp == 2 && cornerstaken ~= 3
+%       if opponent has two corners, make sure to block them from making a
+%       fork move
+        edges = [1,2;2,1;2,3;3,2];
+        randedge = randi([1,4]);
+        
+        while checkvalidmove(edges(randedge,1), edges(randedge,2), gamestate) == false
+           	randedge = randi([1,4]);
+        end
+       	row = edges(randedge, 1);
+       	col = edges(randedge, 2);
     else
-        if gamestate(corners(Row, 1), corners(Row, 2)) == opponentnum
 %       it finds a corner spot, and then tries to place
 %    	its move in a random edge spot thats not already taken by
-
-% ~~~~~~~~~~ remember to fix Row issue where it glitches and freezes
-            randcorner = randi([1,4]);
-           	while checkvalidmove(corners(randcorner,1), corners(randcorner,2), gamestate) == false
-                randcorner = randi([1,4]);
-            end
-            row = corners(randcorner, 1);
-            col = corners(randcorner, 2);
+     	randcorner = randi([1,4]);
             
+        while checkvalidmove(corners(randcorner,1), corners(randcorner,2), gamestate) == false
+        	randcorner = randi([1,4]);
         end
+       	row = corners(randcorner, 1);
+       	col = corners(randcorner, 2);
+        
     end
 end
 
@@ -110,7 +123,7 @@ for Row = 1:3
         tempgamestate = gamestate;
         if checkvalidmove(Row, Col, gamestate) == true
             tempgamestate(Row, Col) = opponentnum;
-            [winmove, playerwinner, fullgame] = checkwin(tempgamestate);
+            [winmove, playerwinner, ~] = checkwin(tempgamestate);
             if playerwinner == opponentnum && winmove == true
                 row = Row;
                 col = Col;
@@ -125,14 +138,12 @@ for Row = 1:3
         tempgamestate = gamestate;
         if checkvalidmove(Row, Col, gamestate) == true
             gamestate(Row, Col) = playernum;
-            [winmove, playerwinner, fullgame] = checkwin(gamestate);
+            [winmove, playerwinner, ~] = checkwin(gamestate);
             if playerwinner == playernum && winmove == true
                 row = Row;
                 col = Col;
             end
             gamestate = tempgamestate;
-            
-            
         end
     end
 end

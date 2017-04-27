@@ -3,7 +3,7 @@ function  [winmove, player, fullgame] = checkwin(gamestate)
 % 
 % This function checks if the player(1 or 2) has won or not and returns
 % true or false
-% Also checks if the gameboard is completely full and returns 
+% Also checks if the gameboard is completely full and returns true or false
 % 
 % Dominick Anatala 2017 Version 1.0
 
@@ -36,13 +36,13 @@ end
 % then checks diagonals
 if gamestate(1,1) == gamestate(2,2) && gamestate(2,2) == gamestate(3,3) && gamestate(3,3) ~= 0
    winmove = true; 
-   player = gamestate(1, 1);
+   player = gamestate(2, 2);
 
    return;
    
 elseif gamestate(3,1) == gamestate(2,2) && gamestate(2,2) == gamestate(1, 3) && gamestate(1,3) ~= 0
    winmove = true; 
-   player = gamestate(1, 3);
+   player = gamestate(2, 2);
    
    return;
 end

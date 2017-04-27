@@ -8,7 +8,6 @@ function  printgamestate(gamestate)
 
 fprintf('      1       2       3   \n')
 for Row = 1:3
-    
 %   Converts the numerical value to the player pieces, X or O
     for Col = 1:3
         if gamestate(Row,Col) == 1
@@ -20,7 +19,7 @@ for Row = 1:3
         end
     end
     
-    % prints out semi graphical printout of tic tac toe screen
+%   prints out ascii art printout of tic tac toe screen
     if Row ~= 3
         fprintf('          |       |       \n  %d   %s   |   %s   |   %s     \n   _______|_______|_______\n', Row, gamestate(Row,1), gamestate(Row,2), gamestate(Row, 3))
     else

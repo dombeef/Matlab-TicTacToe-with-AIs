@@ -10,7 +10,11 @@ function  [row, col] = aimode2(gamestate, playernum)
 col = 0;
 row = 0;
 
-[winmove, playerwinner, fullgame] = checkwin(gamestate);
+% rnd shuffle to make the ai moves a little more randomized and for which
+% player goes first
+rng('shuffle');
+
+[winmove, ~, ~] = checkwin(gamestate);
 
 % first check if other user is about to score
 while  checkvalidmove(row, col, gamestate) == false && winmove == false
@@ -18,9 +22,8 @@ while  checkvalidmove(row, col, gamestate) == false && winmove == false
     row = randi([1,3]);
 end
 
-tempgamestate = gamestate;
-
-% So it also works for ai vs ai
+% Checks what player number this AI is so it is not hardcoded for a
+% specific turn
 if playernum == 1
     opponentnum = 2;
 else
@@ -32,14 +35,12 @@ for Row = 1:3
         tempgamestate = gamestate;
         if checkvalidmove(Row, Col, gamestate) == true
             gamestate(Row, Col) = opponentnum;
-            [winmove, playerwinner, fullgame] = checkwin(gamestate);
+            [winmove, playerwinner, ~] = checkwin(gamestate);
             if playerwinner == opponentnum && winmove == true
                 row = Row;
                 col = Col;
             end
-            gamestate = tempgamestate;
-            
-            
+            gamestate = tempgamestate; 
         end
     end
 end
@@ -50,14 +51,12 @@ for Row = 1:3
         tempgamestate = gamestate;
         if checkvalidmove(Row, Col, gamestate) == true
             gamestate(Row, Col) = playernum;
-            [winmove, playerwinner, fullgame] = checkwin(gamestate);
+            [winmove, playerwinner, ~] = checkwin(gamestate);
             if playerwinner == playernum && winmove == true
                 row = Row;
                 col = Col;
             end
             gamestate = tempgamestate;
-            
-            
         end
     end
 end
